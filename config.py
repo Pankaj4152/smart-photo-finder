@@ -35,7 +35,7 @@ class Config(BaseSettings):
     db_path: Path = DATA_DIR / "image_database.json"
     
     # Search Settings
-    min_similarity: float = 0.5
+    min_similarity: float = 0.3
     top_k: int = 5
     faiss: bool = False
 
