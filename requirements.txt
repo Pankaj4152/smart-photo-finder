@@ -1,4 +1,6 @@
 nexaai
 numpy
 pydantic
-dotenv
+python-dotenv
+sentence-transformers
+pillow
