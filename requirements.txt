@@ -4,3 +4,4 @@ pydantic
 python-dotenv
 sentence-transformers
 pillow
+pydantic-settings
