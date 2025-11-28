@@ -83,22 +83,22 @@ def valid_db_record(record: Dict[str, Any]) -> bool:
     """
     # Ensure 'path' field exist
     if "path" not in record:
-        logger.debug(f"Missing path field in record: {record}")
+        logger.warning(f"Invalid DB record: missing 'path'. Record={record}")
         return False
     
     # Ensure 'description' field exists and is not empty
     if "description" not in record or record["description"] is None or record["description"]=="":
-        logger.debug(f"Missing or empty description field in record: {record}")
+        logger.warning(f"Invalid DB record: missing or empty description. Path={record.get('path')}")
         return False
     
     # Ensure 'embedding' field exists and is a non-empty list
     if "embedding" not in record or not isinstance(record["embedding"], list) or len(record["embedding"])==0:
-        logger.debug(f"Missing or invalid embedding field in record: {record}")
+        logger.warning(f"Invalid DB record: embedding missing/empty. Path={record.get('path')}")
         return False
     
     # Ensure filename field exists and is not empty
     if "filename" not in record or record["filename"] is None or record["filename"]=="":
-        logger.debug(f"Missing or empty filename field in record: {record['path']}. Adding filename.")
+        logger.info(f"Record missing filename → auto-assigning from path: {record['path']}")
         record["filename"]=extract_filename_from_path(record["path"])
 
     

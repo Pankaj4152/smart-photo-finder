@@ -18,25 +18,31 @@ logger = get_logger(__name__)
 
 class VLMService:
     def __init__(self):
+        logger.debug("Initializing VLMService...")
         self.model: Optional[VLM] = None
         self._load_model()
+        logger.debug("VLMService initialized.")
 
     def _load_model(self):
+        logger.info("Loading VLM model...")
+        
         try:
-            logger.info("Loading VLM model...")
-
             m_cfg = ModelConfig(n_gpu_layers=config.gpu_layers)
+            logger.debug(f"ModelConfig: {m_cfg}")
 
+            logger.debug(f"Paths → Model: {config.vlm_model_path}, mmproj: {config.mmproj_path}")
+            
             self.vlm = VLM.from_(
                 name_or_path=config.vlm_model_path,
                 mmproj_path=config.mmproj_path,
                 m_cfg = m_cfg,
                 plugin_id = config.plugin_id
             )
+            logger.debug("VLM loaded successfully.")
 
-            logger.info(f"VLM model loaded successfully. | GPU Layers: {config.gpu_layers}")
         except Exception as e:
-            logger.error(f"Failed to load VLM model: {e}")
+            logger.error(f"Model load failed: {e}")
+            logger.debug("Full traceback:", exc_info=True)
             raise RuntimeError(f"VLM model loading failed. {e}")
         
 
@@ -55,20 +61,22 @@ class VLMService:
                 if hasattr(inner, "reset_cache"):
                     inner.reset_cache()
 
-            logger.debug("VLM model state reset successfully.")
+            logger.debug("VLM model state reset.")
         except Exception as e:
-            logger.warning(f"Failed to reset VLM model state: {e}")
+            logger.warning(f"State reset failed, continuing anyway: {e}")
 
 
     def generate_description(self, image_path: str) -> Optional[str]:
         if not self.vlm:
-            logger.error("VLM model is not initialized.")
+            logger.error("VLM not initialized.")
             return None
 
         if not Path(image_path).exists():
-            logger.error(f"Image not found: {image_path}")
+            logger.warning(f"Image missing: {image_path}")
             return None
         
+        logger.info(f"Processing image: {image_path}")
+        logger.debug("Resetting VLM state...")
         self._reset_state()
 
         prompt = (
@@ -77,7 +85,7 @@ class VLMService:
             " and overall context. Be descriptive and precise."
         )
 
-
+        # Build Conversation
         conversation = [
             MultiModalMessage(
                 role="user",
@@ -94,7 +102,7 @@ class VLMService:
 
             # Streaming generation
             buffer = io.StringIO()
-            logger.debug(f"Generating description for: {image_path}")
+            logger.debug(f"Generating tokens for: {image_path}")
 
 
             for token in self.vlm.generate_stream(
@@ -109,13 +117,15 @@ class VLMService:
             description = buffer.getvalue().strip()
 
             if not description:
-                logger.warning(f"No description generated for: {image_path}")
+                logger.warning(f"No description generated: {image_path}")
                 return None
 
-            logger.info(f"Description generated for {image_path}")
+            logger.info(f"Description generated: {image_path}")
+            logger.debug(f"Output length: {len(description)} chars")
 
             return description
 
         except Exception as e:
-            logger.error(f"Failed to generate description for {image_path}: {e}")
+            logger.error(f"Generation failed for {image_path}: {e}")
+            logger.debug("Traceback:", exc_info=True)
             return None

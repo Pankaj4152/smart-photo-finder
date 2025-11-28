@@ -5,43 +5,63 @@ from services.image_processor_service import ImageProcessorService
 from search.search_engine import SearchEngine
 from utils.file_utils import scan_image_folder, filter_existing_images, fetch_processed_images_paths
 from utils.json_db import save_database, load_database, append_to_database
-
+from logger import get_logger
 from config import config
+import time
 
+# Initialize logger
+logger = get_logger(__name__)
 
 def process_images_flow():
     folder = input("Enter image folder path: ").strip()
-    image_paths = scan_image_folder(folder)
+    logger.info(f"Processing flow started for folder: {folder}")
 
+    image_paths = scan_image_folder(folder)
     if not image_paths:
+        logger.debug("No valid images found in the specified folder.")
         print("No valid images found.")
         return
 
-    vlm = VLMService()
-    embedder = EmbedderService()
-    processor = ImageProcessorService(vlm, embedder)
+    try:
+        logger.info("Initializing services...")
+        vlm = VLMService()
+        embedder = EmbedderService()
+        processor = ImageProcessorService(vlm, embedder)
+    except Exception as e:
+        logger.exception(f"Service initialization failed: {e}")
+        print("Initialization error. Check logs.")
+        return
 
     # filter images which has not been processed yet
     existing_db = load_database()
     # processed_images = fetch_processed_images_paths(existing_db)
     filtered_image_paths = filter_existing_images(image_paths, existing_db)
-
+    logger.info(f"Images to process: {len(filtered_image_paths)}")
 
     results = processor.process_images(filtered_image_paths)
+    logger.info(f"Processing completed. Successfully processed: {len(results)}")
 
     if not results:
         print("No images processed.")
         return
 
     if append_to_database(results):
+        logger.info(f"Database updated → {config.db_path}")
         print(f"Database saved to: {config.db_path}")
     else:
+        logger.error("Failed to update database.")
         print("Failed to save database.")
+
+    logger.info(f"Total processing time: {time.time() - start:.2f}s")
+
 
 
 def search_flow():
+    logger.info("Search flow started.")
     db = load_database()
+
     if not db:
+        logger.warning("Search attempted but database is empty.")
         print("Database is empty. Process images first.")
         return
 
@@ -52,7 +72,10 @@ def search_flow():
     while True:
         query = input("Search: ").strip()
         if query.lower() == "exit":
+            logger.info("Search flow exited.")
             break
+
+        logger.debug(f"Search query: {query}")
 
         results = engine.search(query)
         if not results:
@@ -66,6 +89,8 @@ def search_flow():
 
 
 def main():
+    logger.info("Application started.")
+
     while True:
         print("\n1. Process images")
         print("2. Search images")
@@ -78,8 +103,10 @@ def main():
         elif choice == "2":
             search_flow()
         elif choice == "3":
+            logger.info("Application exited by user.")
             break
         else:
+            logger.warning(f"Invalid menu option selected: {choice}")
             print("Invalid choice.")
 
 
