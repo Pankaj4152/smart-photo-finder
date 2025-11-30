@@ -32,6 +32,7 @@ class Config(BaseSettings):
 
 
     # Database
+    db_backend: str = "json"  # Options: json, chromadb, faiss
     db_path: Path = DATA_DIR / "image_database.json"
     
     # Search Settings

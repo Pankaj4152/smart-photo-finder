@@ -3,10 +3,11 @@ from typing import List
 
 from config import config
 from logger import get_logger
-from utils.json_db import load_database, valid_db_record
+from utils.json_db import JsonDatabase
 
 logger = get_logger(__name__)
 
+json_db = JsonDatabase()
 
 def is_valid_image(path: Path) -> bool:
     """
@@ -68,7 +69,7 @@ def filter_existing_images(
     db_paths = [record["path"] for record in existing_db]
     existing_paths = []
     for record in  list(set(db_paths) & set(image_paths)):
-        if valid_db_record(record):
+        if json_db.valid_db_record(record):
             existing_paths.append(record["path"])
         else:
             logger.debug(f"Invalid DB record, skipping path check: {record}")

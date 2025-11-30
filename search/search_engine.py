@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Dict, Tuple, Any
 
-from utils.json_db import load_database
+from utils.json_db import JsonDatabase
 from search.indexer import SimpleIndexer
 from services.embedder_service import EmbedderService
 
@@ -10,11 +10,12 @@ from logger import get_logger
 
 logger = get_logger(__name__)
 
+json_db = JsonDatabase()
 
 class SearchEngine:
     def __init__(self, embedder: EmbedderService):
         self.embedder = embedder
-        self.db = load_database()
+        self.db = json_db.load_database()
 
         if not self.db:
             logger.warning("Empty or missing database. Search will return no results.")

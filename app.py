@@ -4,7 +4,8 @@ from services.image_processor_service import ImageProcessorService
 
 from search.search_engine import SearchEngine
 from utils.file_utils import scan_image_folder, filter_existing_images, fetch_processed_images_paths
-from utils.json_db import save_database, load_database, append_to_database
+# from utils.json_db import save_database, load_database, append_to_database
+from utils.json_db import JsonDatabase
 from logger import get_logger
 from config import config
 import time
@@ -12,17 +13,23 @@ import time
 # Initialize logger
 logger = get_logger(__name__)
 
+if config.db_backend.lower() == "json":
+    logger.warning(f"Current database backend is set to '{config.db_backend}'. This app.py only supports 'json' backend.")
+    json_db = JsonDatabase()
+
 def process_images_flow():
     folder = input("Enter image folder path: ").strip()
     logger.info(f"Processing flow started for folder: {folder}")
     start = time.time()
 
+    # Scan folder for images
     image_paths = scan_image_folder(folder)
     if not image_paths:
         logger.debug("No valid images found in the specified folder.")
         print("No valid images found.")
         return
 
+    # Initialize services
     try:
         logger.info("Initializing services...")
         vlm = VLMService()
@@ -34,7 +41,7 @@ def process_images_flow():
         return
 
     # filter images which has not been processed yet
-    existing_db = load_database()
+    existing_db = json_db.load_database()
     # processed_images = fetch_processed_images_paths(existing_db)
     filtered_image_paths = filter_existing_images(image_paths, existing_db)
     logger.info(f"Images to process: {len(filtered_image_paths)}")
@@ -46,7 +53,7 @@ def process_images_flow():
         print("No images processed.")
         return
 
-    if append_to_database(results):
+    if json_db.append_to_database(results):
         logger.info(f"Database updated -> {config.db_path}")
         print(f"Database saved to: {config.db_path}")
     else:
@@ -59,7 +66,7 @@ def process_images_flow():
 
 def search_flow():
     logger.info("Search flow started.")
-    db = load_database()
+    db = json_db.load_database()
 
     if not db:
         logger.warning("Search attempted but database is empty.")
@@ -95,7 +102,7 @@ def main():
     while True:
         print("\n1. Process images")
         print("2. Search images")
-        print("3. Exit")
+        print("0. Exit")
 
         choice = input("Choice: ").strip()
 
@@ -103,7 +110,7 @@ def main():
             process_images_flow()
         elif choice == "2":
             search_flow()
-        elif choice == "3":
+        elif choice == "0":
             logger.info("Application exited by user.")
             break
         else:
