@@ -2,8 +2,8 @@ import os
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 from pathlib import Path
-from typing import List
-
+from typing import List, Optional
+import random
 load_dotenv()
 
 
@@ -24,17 +24,25 @@ class Config(BaseSettings):
     gpu_layers: int = 0
     max_tokens: int = 200
     plugin_id: str = "nexaml"
-    
+
+    # VLM Model Configurations Hyper-parameters
+    vlm_n_ctx: int = 4096
+    vlm_n_threads: Optional[int] = None
+    vlm_n_threads_batch: Optional[int] = None
+    vlm_n_batch: int = 512
+    vlm_n_ubatch: int = 512
+
+
     # Embedder
     embedder_model_path: str = "all-MiniLM-L6-v2"
     embedding_dim: int = 384
     embedder_batch_size: int = 32
 
-
+    # device: str = "cpu"
     # Database
-    db_backend: str = "json"  # Options: json, chromadb, faiss
+    db_backend: str = "json"  # Options: json, chromadb
     db_path: Path = DATA_DIR / "image_database.json"
-    
+
     # Search Settings
     min_similarity: float = 0.3
     top_k: int = 5
@@ -42,12 +50,14 @@ class Config(BaseSettings):
 
     # Files
     allowed_extensions: List[str] = [".jpg", ".jpeg", ".png"]
-    
+
     # Logging (INFO, DEBUG, WARNING, ERROR)
-    log_level: str = "DEBUG"
+    log_level: str = "INFO"
 
     # class Config:
     #     env_file = ".env"
     #     env_file_encoding = "utf-8"
+
+
 
 config = Config()
