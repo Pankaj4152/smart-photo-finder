@@ -66,18 +66,24 @@ def filter_existing_images(
     Filters out images that are already present in the existing database.
     And check if processed and saved in db correctly.
     """
-    db_paths = [record["path"] for record in existing_db]
-    existing_paths = []
-    for record in  list(set(db_paths) & set(image_paths)):
-        if json_db.valid_db_record(record):
-            existing_paths.append(record["path"])
-        else:
-            logger.debug(f"Invalid DB record, skipping path check: {record}")
+    # Normalize incoming image paths to absolute resolved strings
+    incoming_resolved = {str(Path(p).resolve()) for p in image_paths}
 
+    # Build set of validated processed paths from DB records
+    processed_resolved = set()
+    for record in existing_db:
+        try:
+            if json_db.valid_db_record(record):
+                rp = record.get("path")
+                if rp:
+                    processed_resolved.add(str(Path(rp).resolve()))
+        except Exception:
+            logger.debug(f"Skipping invalid DB record during filtering: {record}")
 
-    filtered = [p for p in image_paths if p not in existing_paths]
+    # Filter out any image whose resolved path is already in processed_resolved
+    filtered = [p for p in image_paths if str(Path(p).resolve()) not in processed_resolved]
 
-    logger.info(f"Filtered images: {len(image_paths)} -> {len(filtered)} (existing: {len(existing_paths)})")
+    logger.info(f"Filtered images: {len(image_paths)} -> {len(filtered)} (existing: {len(processed_resolved)})")
     return filtered
 
 def fetch_processed_images_paths(

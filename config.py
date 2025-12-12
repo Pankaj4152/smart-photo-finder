@@ -38,9 +38,9 @@ class Config(BaseSettings):
     embedding_dim: int = 384
     embedder_batch_size: int = 32
 
-    # device: str = "cpu"
+    device: str = "cpu"  # Options: cpu, gpu
     # Database
-    db_backend: str = "json"  # Options: json, chromadb
+    db_backend: str = "json"
     db_path: Path = DATA_DIR / "image_database.json"
 
     # Search Settings
