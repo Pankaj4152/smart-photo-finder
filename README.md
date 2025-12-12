@@ -312,57 +312,26 @@ python --version
 
 ## 🗺️ Roadmap
 
-### v1.0 (Current) ✅
-- [x] Image description generation
-- [x] Semantic embeddings
-- [x] JSON database
-- [x] CLI interface
-- [x] Modular architecture
+### v1 (Current) ✅
+- ✅ Image description generation (VLM) — see [`services.vlm_service.VLMService`](d:\Pankaj\Nexa AI\nexaai\services\vlm_service.py)
+- ✅ Semantic embeddings (embedder) — see [`services.embedder_service.EmbedderService`](d:\Pankaj\Nexa AI\nexaai\services\embedder_service.py)
+- ✅ JSON database (local, simple storage)
+- ✅ CLI interface (`app.py`)
+- ✅ Batch processing with progress bar — implemented in [`services.image_processor_service.ImageProcessorService.process_images`](d:\Pankaj\Nexa AI\nexaai\services\image_processor_service.py) (uses `tqdm`)
+- ✅ Modular architecture and logging
 
-### v1.1 (In Progress) 🚧
-- [ ] Gradio web UI
-- [ ] Batch processing improvements
-- [ ] Progress bars & better UX
-- [ ] GPU acceleration docs
+### v2 (Planned & working) 🚧
+- [ ] Lightweight UI (Streamlit / FastAPI + minimal frontend) — planned deliverable
+- [ ] Larger-dataset backends: ChromaDB / FAISS adapter for scale (10k+ images)
+- [ ] Basic GPU acceleration and docs: add examples for configuring GPU / gpu_layers in [`config.py`](d:\Pankaj\Nexa AI\nexaai\config.py)
+- [ ] Model presets & easier model selection via config (multiple VLM / embedder presets)
+- [ ] Resumable / faster batch indexing (multi-thread / async)
 
-### v2.0 (Planned) 📋
-- [ ] FAISS for faster search (10K+ images)
-- [ ] Benchmarking script
-- [ ] Image clustering & auto-albums
-- [ ] Android mobile app
-- [ ] Multi-language support
-
----
-
-## Future plans
-
-We plan to expand the project in a few practical directions:
-
-- UI
-  - Use Streamlit for basic UI 
-  - Add a lightweight web UI (FastAPI + simple React/Vue) for browsing, searching and batch-indexing.
-
-- Database & scale
-  - Support additional backends for larger collections:
-    - ChromaDB (recommended for persistent vector indices and metadata)
-    - FAISS (high-performance large-scale ANN)
-  - Current recommendation: JSON backend is simple and reliable for small collections (rough guideline: up to ~5k images). For larger datasets switch to Chroma or FAISS.
-
-- Models & performance
-  - Add more VLM/embedding model options (smaller/quantized variants) and example presets for CPU/GPU/NPU.
-  - Support model-selection via config (change vlm_model_path / embedder_model_path in config.py).
-  - Add model-quantization instructions and pre-download scripts for reproducible local installs.
-
-- Features
-  - Faster batch indexing (multi-threaded / async) and resumable indexing.
-  - Image-query-by-image (visual search) improvements and result re-ranking.
-  - Privacy-first features (on-device-only workflows & offline demos).
-  - Plugin system for custom preprocessors or downstream apps.
-
-- Ops & docs
-  - Add example performance numbers (CPU vs GPU vs NPU) and short guide on choosing backends/models.
-  - Provide migration guides for switching from JSON -> Chroma/FAISS, and a CLI flag to select backend.
-
+## Future plans (short)
+- Add more compact / quantized models and NPU-targeted variants
+- Mobile/Android demo and lightweight clients
+- Image clustering, auto-albums, and advanced re-ranking
+- Plugin system for custom preprocessors and export formats
 
 ---
 
