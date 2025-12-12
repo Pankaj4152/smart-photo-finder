@@ -10,8 +10,8 @@
 
 > 🏆 **Submitted for NexaAI Builder Bounty Program**  
 <!-- > Find images by describing what you're looking for, not by filename or tags. Powered by vision-language models and semantic embeddings. -->
-
-<!-- [Demo](#-demo) • [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](docs/USAGE.md) -->
+[Demo](https://youtu.be/YVkPa-aJpEo)
+<!--  • [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](docs/USAGE.md) -->
 [Documentation](docs/USAGE.md)
 ---
 
@@ -240,7 +240,7 @@ Menu > Search images
 <video controls src="search image.mp4" title="Search Image"></video>
 <!-- ![Search Demo](assets/demo_search.gif) -->
 
-<!-- **Watch Full Demo:** [YouTube Link] or [Demo.mp4](assets/demo.mp4) -->
+**Watch Full Demo:** [[YouTube Link](https://youtu.be/YVkPa-aJpEo)]
 
 
 
